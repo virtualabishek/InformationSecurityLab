@@ -1,304 +1,103 @@
-### Key Points
+Great. I will prepare detailed notes for your Bachelor of Information Technology exam under TU on Unit 3: Message Authentication. This will include explanations in paragraph and bullet formats, relevant examples, summaries with mnemonics for memorization, and comparison tables where useful. I’ll let you know as soon as it’s ready.
 
-- Research suggests Unit 2 of the BIT exam at Tribhuvan University covers classical and modern encryption methods, focusing on symmetric encryption algorithms.
-- It seems likely that topics include substitution and transposition ciphers, symmetric encryption principles, DES, mathematical foundations (fields, modular arithmetic, Galois fields, polynomial arithmetic), and AES.
-- The evidence leans toward these topics being essential for understanding how data is secured, with AES being the modern standard replacing DES.
+# Unit 3: Message Authentication (6 Hrs)
 
-### Classical Cryptosystems
+## 3.1 Message Authentication
 
-Classical cryptosystems, like substitution and transposition ciphers, are early encryption methods. Substitution ciphers replace letters with others (e.g., Caesar cipher shifts letters by a fixed number), while transposition ciphers rearrange letters (e.g., Rail Fence cipher). These are simple but weak alone, often combined for better security.
+Message authentication ensures that a message is from the claimed sender and has not been altered in transit. In other words, the receiver can verify both the integrity (no tampering) and the origin (authentic sender) of the data. This is usually done by attaching a small authentication tag or code to the message. For example, in a secure communication between Alice and Bob, Alice can compute a **Message Authentication Code (MAC)** on her message using a shared secret key. Bob recomputes the MAC on receipt and checks it against the tag; if they match, Bob knows the message is genuine and unchanged.
 
-### Symmetric Encryption
+- **Key Properties:** Verifies data integrity (no changes) and origin authentication (correct sender).
+- **Techniques:** Commonly done with a secret-key _MAC_ or with asymmetric _digital signatures_.
+- **MAC (Message Authentication Code):** A short tag computed from the message and a secret key. Both sender and receiver share the key. The receiver recomputes the MAC to check integrity.
+- **Example:** Alice sends a file to Bob with a MAC tag. Bob uses the same key to verify the MAC; if an eavesdropper had modified the file, the MAC check would fail.
+- **Limitation:** MACs use a shared secret key, so they do not provide non-repudiation (the sender could later claim not to have sent it).
 
-Symmetric encryption uses one key for both encryption and decryption, making it fast for large data but requiring secure key sharing. It’s widely used in systems like online banking.
+**Mnemonic:** _“MAC = Message Authenticator Code – Makes Authentic Content.”_
 
-### DES and AES
+## 3.2 Secure Hash Functions
 
-DES, a 1970s standard, encrypts 64-bit data blocks with a 56-bit key but is now insecure due to short key length. AES, adopted in 2001, uses 128, 192, or 256-bit keys, encrypting 128-bit blocks, and is highly secure for modern applications.
+A **secure hash function** takes any input data (of any length) and produces a fixed-size output (the _hash_ or _digest_). The output looks like a random fingerprint of the input. Such functions are _one-way_: it’s computationally infeasible to reverse or find an input from its hash. They also satisfy **collision resistance**: it’s extremely hard to find two different inputs that give the same hash. A key feature is the _avalanche effect_: even a tiny change in input (e.g. flipping 1 bit) causes a completely different hash. This makes it easy to detect any data tampering. For example, a hash of a downloaded file can be compared to the expected hash to check the file wasn’t corrupted or altered.
 
-### Mathematical Foundations
+- **Fixed-size output:** Maps data of any length to a fixed-length digest (e.g. 256 bits).
+- **One-way:** Hard to invert; knowing the hash does not reveal the original data.
+- **Collision-resistant:** Hard to find two inputs with the same hash.
+- **Avalanche effect:** Small input changes produce large, unpredictable hash changes.
+- **Uses:** Verifying data integrity (e.g. checksums), password hashing, digital signatures, and building MACs or address identifiers. For example, storing a file’s hash allows later checking that the file wasn’t altered.
+- **Note:** A secure hash is not encrypted data; it can be shared openly. Its security lies in its mathematical properties (preimage resistance, collision resistance, etc.).
 
-Fields, modular arithmetic, Galois fields, and polynomial arithmetic provide the math behind encryption. Modular arithmetic ensures operations stay within a set range, while Galois fields (used in AES) enable secure computations.
+**Mnemonic:** _“HASH = Hashed Always Secures (and highlights) changes.”_
 
-For more details, see the comprehensive notes below.
+## 3.3 Message Digests: MD5
 
----
+**MD5 (Message-Digest Algorithm 5)** is a well-known hash function that produces a 128-bit (16-byte) digest. It was designed by Ronald Rivest in 1991. For each message, MD5 outputs a 128-bit hash; even a slight change in the message yields a very different hash. MD5 was widely used for file checksums and passwords. However, MD5 is now **considered broken**: practical collision attacks exist, meaning two different inputs can be made to produce the same MD5 hash in very little time. In fact, by 2008 researchers declared MD5 “cryptographically broken and unsuitable”. Today MD5 should **not** be used for security purposes like digital signatures; it remains only for legacy or non-security uses (for example, quick file partitioning where collision risk is acceptable).
 
-# Unit 2: Symmetric and Asymmetric Encryption Algorithms (10 Hrs.)
+- **Digest size:** 128 bits (16 bytes).
+- **Design:** Created by Rivest (MIT) in 1991 as an improvement over MD4.
+- **Speed:** Fast to compute (uses 512-bit blocks internally).
+- **Security:** _Insecure._ Collisions can be found quickly. Attacks demonstrated by 2004 show MD5 hashes can be collided in seconds on a normal computer. The Flame malware (2012) even exploited MD5 collisions for a fake security certificate.
+- **Use cases (historical):** Common for file integrity checks (e.g. comparing MD5 sums after download). Not safe for any cryptographic integrity/authentication.
+- **Summary:** MD5 = legacy hash; small size (128-bit) with **known vulnerabilities**.
 
-This document provides detailed notes for Unit 2 of the BIT exam at Tribhuvan University, specifically for the Information Security course (BIT 303, Semester 5). The notes cover classical cryptosystems, symmetric encryption principles, Data Encryption Standard (DES), mathematical foundations (fields, modular arithmetic, Galois fields, polynomial arithmetic), and Advanced Encryption Standard (AES). These notes are designed for exam preparation, offering clear explanations, examples, and key points for memorization.
+| **Feature**          | **MD5**                      | **SHA-1**                   |
+| -------------------- | ---------------------------- | --------------------------- |
+| Digest length        | 128 bits                     | 160 bits                    |
+| Designed by/year     | Rivest, 1991                 | NSA, 1995                   |
+| Internal block size  | 512 bits                     | 512 bits                    |
+| Security status      | Broken: collisions known     | Broken: collisions found    |
+| Typical use (legacy) | Checksums, non-secure hashes | Older SSL/TLS, Git (legacy) |
 
-## Background and Context
+**Example:** A download site may publish an MD5 checksum so users can verify file integrity. (However, a hostile attacker could spoof both file and MD5 if they wanted to cheat, which is why MD5 is not trusted for security.)
 
-The Bachelor of Information Technology (BIT) program at Tribhuvan University is a four-year, eight-semester course that includes Information Security in Semester 5. Unit 2 focuses on encryption algorithms, emphasizing symmetric methods, which are critical for securing data in modern systems. The notes are compiled from standard cryptographic resources and align with the TU syllabus.
+**Mnemonic:** _“MD5 – Many Defects (5 words long!), now Don’t secure.”_
 
-## Detailed Notes by Subtopic
+## 3.4 Secure Hash Algorithms: SHA-1, SHA-2
 
-### 2.1. Classical Cryptosystems: Substitution and Transposition Ciphers
+**SHA-1:** The Secure Hash Algorithm 1 produces a 160-bit digest. It was designed by the NSA and published in 1995. SHA-1 improves on MD5 (longer hash, different structure), but it too is now insecure. In 2017 researchers demonstrated a practical collision on SHA-1 (two different files with the same SHA-1). NIST has banned SHA-1 for digital signatures and other security uses. In practice, SHA-1 is _deprecated_: browsers and protocols no longer accept SHA-1 certificates. (Some legacy systems still use it, but migration to SHA-2 is required.)
 
-Classical cryptosystems are early encryption methods that laid the groundwork for modern cryptography. They are categorized into substitution and transposition ciphers, often combined for enhanced security.
+- **SHA-1 Details:** 160-bit output, uses 512-bit blocks, 80 rounds of mixing.
+- **Collision attack:** Yes – broken. First public collision in 2017. Recommended to use SHA-2 or SHA-3 instead.
+- **Use cases:** Earlier used in SSL certificates and version control (Git uses SHA-1 hashes for commits). No new applications should use SHA-1.
 
-#### Substitution Ciphers
+**SHA-2:** A family of hash functions (SHA-224, SHA-256, SHA-384, SHA-512) developed by NSA and standardized in 2001. The variants differ by output length: SHA-256 produces a 256-bit hash; SHA-512 produces a 512-bit hash; SHA-224 and SHA-384 are truncated versions of SHA-256 and SHA-512, respectively. SHA-2 functions are structurally similar (Merkle–Damgård design) and are currently considered secure (no practical collisions). For example, SHA-256 is widely used in TLS certificates, blockchain (Bitcoin’s addresses use double SHA-256), and file integrity checks.
 
-1. **Definition**: Each unit of plaintext (e.g., a letter) is replaced by another unit (e.g., a different letter or symbol) to form the ciphertext.
-2. **Types**:
-   - **Monoalphabetic Substitution**: Uses a single substitution alphabet throughout the message.
-     - Example: **Caesar Cipher** shifts each letter by a fixed number (e.g., shift of 3: A → D, B → E). For "WIKIPEDIA", the ciphertext is "ZLNLSHGLD".
-     - Example: **Atbash Cipher** reverses the alphabet (A ↔ Z, B ↔ Y).
-   - **Polyalphabetic Substitution**: Uses multiple substitution alphabets, switching based on a keyword or pattern.
-     - Example: **Vigenère Cipher** uses a keyword to determine shifts for each letter.
-3. **Historical Use**: Employed by figures like Mary, Queen of Scots (1578–1584) and in World War I ciphers like ADFGVX.
-4. **Security**: Monoalphabetic ciphers are vulnerable to frequency analysis (e.g., E is the most common letter in English). Polyalphabetic ciphers are stronger but still breakable with advanced techniques.
+- **SHA-2 variants:** Output sizes 224, 256, 384, 512 bits. Block sizes: 512 bits (for 224/256) or 1024 bits (for 384/512). Rounds: 64 (for 224/256) or 80 (for 384/512).
+- **Security:** No known collisions. Security roughly 128-bit for SHA-256, 256-bit for SHA-512 (due to birthday attack, collision resistance is about half the output length).
+- **Adoption:** Widely used in cryptographic protocols and systems. Example: SHA-256 is used in digital certificate signatures and blockchain.
 
-#### Transposition Ciphers
+| **SHA-2 Variant** | **Digest (bits)** | **Block (bits)** | **Rounds** | **Collision Security (bits)** |
+| ----------------- | ----------------- | ---------------- | ---------- | ----------------------------- |
+| SHA-224           | 224               | 512              | 64         | \~112 (no known collision)    |
+| SHA-256           | 256               | 512              | 64         | \~128 (no known collision)    |
+| SHA-384           | 384               | 1024             | 80         | \~192 (no known collision)    |
+| SHA-512           | 512               | 1024             | 80         | \~256 (no known collision)    |
 
-- **Definition**: Rearranges the positions of plaintext units without changing their identities.
-- **Types**:
-  - **Simple Columnar Transposition**: Plaintext is written into a table row by row and read off column by column, guided by a keyword.
-    - Example: For the message "HIDE THE BABOONS" with keyword "GUARD", the plaintext is written in a grid and read by columns.
-  - **Double Transposition**: Applies transposition twice for added complexity.
-  - **Rail Fence Cipher**: Writes plaintext in a zigzag pattern and reads it row by row.
-- **Security**: Weak alone, as attackers can use anagramming to recover the original text. Combining with substitution improves security.
+**Comparison (MD5 vs SHA-1 vs SHA-2):**
 
-#### Combined Systems
+| **Property**    | **MD5**                  | **SHA-1**                 | **SHA-256 (SHA-2)**             |
+| --------------- | ------------------------ | ------------------------- | ------------------------------- |
+| Digest size     | 128 bits                 | 160 bits                  | 256 bits                        |
+| Security status | Broken (easy collisions) | Broken (collisions found) | Secure (no known collisions)    |
+| Use case        | Legacy checksums         | Legacy SSL/Git            | Modern crypto (TLS, blockchain) |
+| Recommendation  | _Do not use_             | _Do not use_              | _Use for security_              |
 
-- Many classical ciphers, like the ADFGVX cipher (used by the German Army in WWI), combine substitution (e.g., Polybius square) and transposition (e.g., columnar).
-- Modern ciphers like AES and DES use substitution and transposition at the bit level.
+**Example:**
 
-#### Example
+- _SHA-1:_ Never sign important data with SHA-1 today (e.g. Git is replacing SHA-1 hashes in new releases).
+- _SHA-2:_ Web browsers and VPNs now require SHA-256 or better in digital certificates.
 
-- **Caesar Cipher**: Encrypt "HELLO" with a shift of 3: H → K, E → I, L → O, L → O, O → R. Ciphertext: "KHOOR".
-- **Rail Fence Cipher**: For "ATTACKATDAWN" with 2 rails, write in a zigzag and read rows: Ciphertext: "ATKTDWATACAN".
+**Mnemonic:** _“SHA Family: Secure Hash Always – 1 (not strong), 2 (stronger and longer).”_
 
-### 2.2. Symmetric Encryption Principles
+## 3.5 Digital Signature
 
-Symmetric encryption uses a single key for both encryption and decryption, making it efficient for securing large data volumes.
+A **digital signature** is a cryptographic way to “sign” data so that its authenticity and integrity can be verified by anyone. It relies on asymmetric (public-key) cryptography. The sender uses their private key to sign a message (usually by hashing the message and then encrypting the hash with the private key). The recipient uses the sender’s public key to verify the signature: they decrypt the signature with the public key and compare it to a freshly computed hash of the message. If they match, the recipient is confident the message came from the holder of the private key and was not altered. Digital signatures also provide **non-repudiation**: the signer cannot later deny sending the message, because only their private key could have created that signature.
 
-#### Key Characteristics
+- **Public-key method:** Uses a private key (to sign) and a public key (to verify). No shared secret is needed between sender and receiver.
+- **How it works:** Compute a hash of the message, encrypt the hash with the signer’s private key (that encrypted hash is the signature). Receiver decrypts with public key and checks the hash.
+- **Security:** Ensures **authenticity** (verifies sender’s identity) and **integrity** (message unchanged). Also provides non-repudiation.
+- **Algorithms:** Common ones include RSA signatures, DSA (Digital Signature Algorithm), and ECDSA (elliptic-curve DSA).
+- **Applications:** Signing software or documents, SSL/TLS certificates, blockchain transactions (signing transfers), secure email (PGP/GPG). For instance, when your web browser connects to https\://, the website’s certificate contains a digital signature from a trusted authority.
+- **Example:** Alice signs a PDF invoice with her private key. Bob (or anyone) can verify Alice’s signature using her public key, proving it was really from Alice and not altered.
 
-- **Single Key**: The same key encrypts and decrypts data, requiring secure key sharing.
-- **Speed**: Faster than asymmetric encryption, ideal for bulk encryption.
-- **Security**: Depends on the secrecy of the key. If compromised, all encrypted data is at risk.
+**Mnemonic:** _“SIG = Sender’s Identity Guaranteed – Signature Gives trust.”_
 
-#### How It Works
-
-- The sender encrypts plaintext using the secret key to produce ciphertext.
-- The receiver uses the same key to decrypt the ciphertext back to plaintext.
-- Types of symmetric ciphers:
-  - **Block Ciphers**: Encrypt fixed-size blocks (e.g., DES, AES).
-  - **Stream Ciphers**: Encrypt data bit by bit, faster but less secure against certain attacks.
-
-#### Use Cases
-
-- Encrypting files, databases, and communications (e.g., VPNs, disk encryption).
-- Often paired with asymmetric encryption for secure key exchange (e.g., in SSL/TLS).
-
-#### Examples
-
-- DES, AES, Blowfish, Twofish.
-
-#### Advantages
-
-- High speed and efficiency for large data.
-- Lower computational requirements compared to asymmetric encryption.
-
-#### Disadvantages
-
-- Key distribution is a challenge; both parties must securely share the key.
-- Key compromise risks all encrypted data.
-
-#### Example
-
-- A bank uses symmetric encryption to secure customer data. The same key encrypts data during transmission and decrypts it at the server, ensuring confidentiality.
-
-### 2.3. Data Encryption Standard (DES)
-
-DES is a symmetric-key block cipher that was a cornerstone of encryption in the late 20th century but is now outdated.
-
-#### Overview
-
-- Developed by IBM in the 1970s, adopted by NIST in 1977 as a federal standard.
-- Uses a 56-bit key to encrypt 64-bit data blocks.
-- Influential in advancing cryptography but replaced due to security weaknesses.
-
-#### How DES Works
-
-- **Block Size**: 64 bits.
-- **Key Size**: 64 bits, with every 8th bit for parity, yielding an effective 56-bit key.
-- **Encryption Process**:
-  - 16 rounds of transformations, each using a 48-bit subkey derived from the main key.
-  - Operations include substitution (via S-boxes) and permutation (via P-boxes).
-- **Decryption**: Uses the same algorithm, with subkeys applied in reverse order.
-
-#### Security
-
-- Initially secure, but the 56-bit key became vulnerable to brute-force attacks by the 1990s.
-- In 1998, the Electronic Frontier Foundation cracked DES in under a day.
-- Considered insecure for modern applications.
-
-#### Triple DES (3DES)
-
-- Applies DES three times with different keys, increasing the effective key length to 168 bits (often 112 bits in practice).
-- Used in legacy systems but slower and less secure than AES.
-
-#### Replacement
-
-- Withdrawn by NIST in 2005, replaced by AES.
-
-#### Example
-
-- A 1980s bank used DES to encrypt transactions. Today, it would use AES due to DES’s vulnerabilities.
-
-### 2.4. Basic Concepts of Fields, Modular Arithmetic, Galois Fields, Polynomial Arithmetic
-
-These mathematical concepts underpin modern cryptographic algorithms like AES.
-
-#### Fields
-
-- A field is a set with addition and multiplication operations satisfying properties like commutativity, associativity, and the existence of inverses.
-- **Finite Fields**: Have a finite number of elements, crucial for cryptography.
-
-#### Modular Arithmetic
-
-- Arithmetic where numbers wrap around after reaching a modulus.
-- Example: In modulo 7, 5 + 4 = 2 (since 9 mod 7 = 2).
-- Used in cryptography for operations that are computationally easy but hard to reverse without the key.
-
-#### Galois Fields (Finite Fields)
-
-- Denoted GF(p^n), where p is a prime and n is a positive integer, with p^n elements.
-- **GF(p)**: Integers modulo p (e.g., GF(7) = {0, 1, 2, 3, 4, 5, 6}).
-- **GF(p^n)** for n &gt; 1: Constructed using polynomial arithmetic modulo an irreducible polynomial.
-- Properties:
-  - Every non-zero element has a multiplicative inverse.
-  - Used in AES (e.g., GF(2^8) for byte operations).
-- Named after Évariste Galois, who established their theory.
-
-#### Polynomial Arithmetic
-
-1. Performed over finite fields, especially GF(2) for binary operations.
-2. Operations: Addition (XOR), multiplication, and division modulo an irreducible polynomial.
-3. Example: In GF(2^8), used in AES, arithmetic is modulo x^8 + x^4 + x^3 + x + 1.
-
-#### Role in Cryptography
-
-1. Finite fields ensure operations are closed (results stay within the field).
-2. Enable efficient computation of inverses for decryption.
-3. Support complex algebraic structures in algorithms like AES.
-
-#### Example
-
-- In AES, bytes are treated as elements in GF(2^8), with operations like multiplication used in the MixColumns step.
-
-### 2.5. Advanced Encryption Standard (AES)
-
-AES is the modern standard for symmetric encryption, widely used for securing sensitive data.
-
-#### Overview
-
-- Adopted by NIST in 2001, replacing DES.
-- Developed by Joan Daemen and Vincent Rijmen as Rijndael.
-- A block cipher encrypting 128-bit data blocks.
-
-#### Key Sizes
-
-- Supports 128, 192, and 256-bit keys.
-- Rounds:
-  - 10 for 128-bit keys
-  - 12 for 192-bit keys
-  - 14 for 256-bit keys
-
-#### How AES Works
-
-- Uses a substitution-permutation network.
-- Each round includes:
-  1. **SubBytes**: Replaces each byte using an S-box (lookup table).
-  2. **ShiftRows**: Cyclically shifts rows of the state.
-  3. **MixColumns**: Combines bytes in each column using polynomial arithmetic in GF(2^8).
-  4. **AddRoundKey**: XORs the state with a round key.
-- The first round has an extra key addition; the last round skips MixColumns.
-
-#### Security
-
-- Highly secure, especially with 256-bit keys, considered unbreakable with current technology.
-- Extensively analyzed with no practical attacks when used correctly.
-
-#### Applications
-
-- Secures government data, financial transactions, VPNs, and SSL/TLS.
-- Implemented in hardware and software for versatility.
-
-#### Example
-
-- A website uses AES-256 to encrypt user passwords, ensuring they remain confidential even if the database is breached.
-
-## Supporting Resources
-
-- Textbooks like _Cryptography and Network Security_ by William Stallings.
-- Online resources like GeeksforGeeks and NIST publications.
-
-## Table: Summary of Unit 2 Subtopics and Key Points
-
-| **Subtopic**                       | **Key Points**                                                                         |
-| ---------------------------------- | -------------------------------------------------------------------------------------- |
-| Classical Cryptosystems            | Substitution (Caesar, Vigenère) and transposition (Rail Fence); combined for security. |
-| Symmetric Encryption Principles    | Single key, fast for bulk data, key distribution challenge; used in DES, AES.          |
-| Data Encryption Standard (DES)     | 56-bit key, 64-bit blocks, 16 rounds; now insecure, replaced by AES.                   |
-| Fields, Modular Arithmetic         | Finite fields (GF(p^n)), modular arithmetic, polynomial arithmetic; basis for AES.     |
-| Advanced Encryption Standard (AES) | 128-bit blocks, 128/192/256-bit keys; SubBytes, ShiftRows, MixColumns; highly secure.  |
-
-## Conclusion
-
-These notes provide a comprehensive overview of Unit 2, covering classical and modern symmetric encryption methods. Focus on understanding the evolution from classical ciphers to AES, the mathematical foundations, and practical applications. Regular revision and practice with examples will enhance your exam performance.
-
-### Key Citations
-
-- [Introduction to Cryptography — Classical Cryptosystems](https://sagrawalx.github.io/crypt/classical-cryptosystems)
-- [Symmetric-key algorithm - Wikipedia](https://en.wikipedia.org/wiki/Symmetric-key_algorithm)
-- [Data Encryption Standard - Wikipedia](https://en.wikipedia.org/wiki/Data_Encryption_Standard)
-- [Finite field arithmetic - Wikipedia](https://en.wikipedia.org/wiki/Finite_field_arithmetic)
-- [Advanced Encryption Standard - Wikipedia](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-- [NIST - Advanced Encryption Standard (AES)](https://www.nist.gov/publications/advanced-encryption-standard-aes)
-- [Substitution Cipher - an overview | ScienceDirect Topics](https://www.sciencedirect.com/topics/computer-science/substitution-cipher)
-- [Difference between Substitution Cipher Technique and Transposition Cipher Technique | GeeksforGeeks](https://www.geeksforgeeks.org/difference-between-substitution-cipher-technique-and-transposition-cipher-technique/)
-- [Classical cipher - Wikipedia](https://en.wikipedia.org/wiki/Classical_cipher)
-- [Substitution Cipher | GeeksforGeeks](https://www.geeksforgeeks.org/substitution-cipher/)
-- [Substitution cipher - Wikipedia](https://en.wikipedia.org/wiki/Substitution_cipher)
-- [Difference between the Substitution Technique and the Transposition Technique - Tpoint Tech](https://www.tpointtech.com/difference-between-the-substitution-technique-and-the-transposition-technique)
-- [Traditional Ciphers in Cryptography](https://www.tutorialspoint.com/cryptography/traditional_ciphers.htm)
-- [Transposition Cipher - an overview | ScienceDirect Topics](https://www.sciencedirect.com/topics/computer-science/transposition-cipher)
-- [Classical Cryptosystems - Cryptography](https://doc.sagemath.org/html/en/reference/cryptography/sage/crypto/classical.html)
-- [Symmetric Encryption 101: Definition, How It Works & When It’s Used](https://www.thesslstore.com/blog/symmetric-encryption-101-definition-how-it-works-when-its-used/)
-- [Symmetric vs. Asymmetric Encryption - What are differences?](https://www.ssl2buy.com/wiki/symmetric-vs-asymmetric-encryption-what-are-differences)
-- [What Is Symmetric Encryption? | IBM](https://www.ibm.com/think/topics/symmetric-encryption)
-- [Symmetric Encryption - an overview | ScienceDirect Topics](https://www.sciencedirect.com/topics/computer-science/symmetric-encryption)
-- [The Ultimate Guide to Symmetric Encryption](https://www.simplilearn.com/tutorials/cryptography-tutorial/symmetric-encryption)
-- [What Is Symmetric Encryption, How Does It Work & Why Use It? - 1Kosmos](https://www.1kosmos.com/blockchain/symmetric-encryption/)
-- [When to Use Symmetric Encryption vs. Asymmetric Encryption](https://www.keyfactor.com/blog/symmetric-vs-asymmetric-encryption/)
-- [Symmetric key cryptography | IBM Quantum Learning](https://learning.quantum.ibm.com/course/practical-introduction-to-quantum-safe-cryptography/symmetric-key-cryptography)
-- [Symmetric Encryption vs Asymmetric Encryption: How it Works and Why it's Used - Device Authority](https://deviceauthority.com/symmetric-encryption-vs-asymmetric-encryption/)
-- [What is Data Encryption Standard? Definition from TechTarget](https://www.techtarget.com/searchsecurity/definition/Data-Encryption-Standard)
-- [Data Encryption Standard Overview](https://www.tutorialspoint.com/cryptography/data_encryption_standard.htm)
-- [Data Encryption Standard (DES) | Set 1 | GeeksforGeeks](https://www.geeksforgeeks.org/data-encryption-standard-des-set-1/)
-- [Data Encryption Standard (DES) Algorithm in Cryptography](https://www.simplilearn.com/what-is-des-article)
-- [Nist](https://nvlpubs.nist.gov/nistpubs/sp958-lide/250-253.pdf)
-- [What Is Data Encryption Standard? - ITU Online IT Training](https://www.ituonline.com/tech-definitions/what-is-data-encryption-standard/)
-- [The DES Algorithm Illustrated](https://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm)
-- [Data Encryption Standard (DES) | Britannica](https://www.britannica.com/topic/Data-Encryption-Standard)
-- [Federal Information Processing Standard (FIPS) 46-3 (Withdrawn), Data Encryption Standard (DES)](https://csrc.nist.gov/pubs/fips/46-3/final)
-- [Why does Cryptography use Polynomial Modular Arithmetic in Finite Fields?](https://risencrypto.github.io/FiniteFields/)
-- [Finite field - Wikipedia](https://en.wikipedia.org/wiki/Finite_field)
-- [number theory - Galois fields in cryptography - Cryptography Stack Exchange](https://crypto.stackexchange.com/questions/2700/galois-fields-in-cryptography)
-- [Galois' Theorem and Polynomial Arithmetic](https://www.doc.ic.ac.uk/~mrh/330tutor/ch04s02.html)
-- [Purdue](https://engineering.purdue.edu/kak/compsec/NewLectures/Lecture6.pdf)
-- [Galois Fields and Its Properties | GeeksforGeeks](https://www.geeksforgeeks.org/galois-fields-and-its-properties/)
-- [Washington](https://sites.math.washington.edu/~morrow/336_12/papers/juan.pdf)
-- [Wustl](https://www.cse.wustl.edu/~jain/cse571-11/ftp/l_04nt.pdf)
-- [What is the Advanced Encryption Standard (AES)? | Definition from TechTarget](https://www.techtarget.com/searchsecurity/definition/Advanced-Encryption-Standard)
-- [Advanced Encryption Standard (AES) | GeeksforGeeks](https://www.geeksforgeeks.org/advanced-encryption-standard-aes/)
-- [Everything You Need to Know About AES-256 Encryption](https://www.kiteworks.com/risk-compliance-glossary/aes-256-encryption/)
-- [AES Encryption: Secure Data with Advanced Encryption Standard](https://www.simplilearn.com/tutorials/cryptography-tutorial/aes-encryption)
-- [What is Advanced Encryption Standard (AES)? - Portnox](https://www.portnox.com/cybersecurity-101/what-is-advanced-encryption-standard-aes/)
-- [Understanding Advanced Encryption Standard (AES)](https://www.tutorialspoint.com/cryptography/advanced_encryption_standard.htm)
-- [Advanced Encryption Standard: The Ultimate Guide To AES Encryption | Veritas](https://www.veritas.com/information-center/aes-encryption)
-- [Advanced Encryption Standard (AES) | NIST](https://www.nist.gov/publications/advanced-encryption-standard-aes-0)
+**Sources:** Standard cryptography references and industry glossaries have been used for definitions. Tables summarize common hash algorithms (MD5, SHA-1, SHA-2) and their key properties.
